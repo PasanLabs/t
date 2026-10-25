@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PASAN LABS | My Projects Hub</title>
+    
+    <!-- โหลด Tailwind CSS เพื่อจัดการ Layout และ Typography พื้นฐาน -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- โหลด Font Google: Inter ให้ดูโมเดิร์น -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* โทนสีพื้นหลังและสีของการ์ด */
+            --bg-color: #0b0f19; /* สีน้ำเงินเข้มเกือบดำ */
+            --card-color: #111827; /* สีพื้นหลังของการ์ด (Tailwind gray-900) */
+            --glow-color: rgba(14, 165, 233, 0.6); /* สีเรืองแสง (Sky blue) */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* เพิ่มลวดลายพื้นหลังเล็กน้อยให้ดูมีมิติ */
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(14, 165, 233, 0.05), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.05), transparent 25%);
+        }
+
+        /* -------------------------------------
+           เอฟเฟคข้อความหัวเว็บ (Gradient Text)
+           ------------------------------------- */
+        .gradient-text {
+            background: linear-gradient(to right, #0ea5e9, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradient-shift 6s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* -------------------------------------
+           เอฟเฟคเรืองแสงของการ์ด (Magic Glow Effect)
+           ------------------------------------- */
+        #cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1100px;
+            width: 100%;
+            padding: 20px;
+            justify-content: center;
+        }
+
+        #cards:hover > .card::after {
+            opacity: 1;
+        }
+
+        .card {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            /* จัดขนาดการ์ดตามหน้าจอ */
+            width: calc(33.33% - 14px); 
+            min-height: 160px;
+            text-decoration: none;
+            transition: transform 0.2s ease;
+        }
+
+        /* เมื่อหน้าจอเล็กกว่า 900px ให้แสดง 2 คอลัมน์ */
+        @media (max-width: 900px) {
+            .card { width: calc(50% - 10px); }
+        }
+        
+        /* เมื่อหน้าจอเล็กกว่า 600px (มือถือ) ให้แสดง 1 คอลัมน์ */
+        @media (max-width: 600px) {
+            .card { width: 100%; min-height: 140px; }
+            #cards { padding: 10px; }
+        }
+
+        .card:hover {
+            transform: translateY(-5px); /* เด้งขึ้นเล็กน้อยตอน Hover */
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card::before,
+        .card::after {
+            border-radius: inherit;
+            content: "";
+            height: 100%;
+            left: 0px;
+            opacity: 0;
+            position: absolute;
+            top: 0px;
+            transition: opacity 500ms;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        /* แสงพื้นหลังบางๆ เวลานำเมาส์เข้าใกล้การ์ดอื่น */
+        .card::before {
+            background: radial-gradient(
+                800px circle at var(--mouse-x) var(--mouse-y),
+                rgba(255, 255, 255, 0.06),
+                transparent 40%
+            );
+            z-index: 3;
+        }
+
+        /* แสงกรอบที่วิ่งตามเมาส์ (สีสัน) */
+        .card::after {
+            background: radial-gradient(
+                500px circle at var(--mouse-x) var(--mouse-y),
+                var(--glow-color),
+                transparent 40%
+            );
+            z-index: 1;
+        }
+
+        /* ส่วนเนื้อหาภายในการ์ด (บังแสงไว้ให้เห็นแค่กรอบ) */
+        .card > .card-content {
+            background-color: var(--card-color);
+            border-radius: inherit;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            inset: 2px; /* ขนาดความหนาของกรอบแสง (2px) */
+            padding: 24px;
+            position: absolute;
+            z-index: 2;
+            transition: background-color 0.3s ease;
+        }
+
+        .card:hover > .card-content {
+            background-color: #172033; /* สว่างขึ้นเล็กน้อยเมื่อชี้ */
+        }
+
+        /* Animation ตอนโหลดหน้าเว็บ */
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="text-white relative overflow-x-hidden">
+
+    <!-- Header Section -->
+    <header class="w-full pt-20 pb-10 flex flex-col items-center justify-center text-center fade-in-up">
+        <!-- โลโก้ / ไอคอน -->
+        <div class="w-20 h-20 mb-6 rounded-2xl bg-gradient-to-br from-sky-400 to-purple-600 flex items-center justify-center shadow-[0_0_40px_rgba(14,165,233,0.3)]">
+            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+            </svg>
+        </div>
+        
+        <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight mb-4">
+            <span class="gradient-text">PASAN LABS</span>
+        </h1>
+        <p class="text-gray-400 text-lg max-w-lg px-4">
+            ศูนย์รวมโปรเจกต์และการทดลองต่างๆ ของผม <br class="hidden md:block">เลือกเข้าชม Lab ที่สนใจด้านล่างได้เลยครับ
+        </p>
+    </header>
+
+    <!-- 
+        =======================================================================
+        ส่วนของการ์ดลิงก์ (เพิ่ม/ลด ได้ที่นี่)
+        =======================================================================
+        วิธีเพิ่มลิงก์: ให้คัดลอกโค้ดตั้งแต่ <a ...> จนถึง </a> ไปวางต่อกันได้เลย
+    -->
+    <main id="cards" class="fade-in-up" style="animation-delay: 0.2s;">
+
+        <!-- 🟢 ลิงก์ที่ 1 -->
+        <a href="https://example.com/lab1" target="_blank" class="card">
+            <div class="card-content">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xl font-bold text-white">Lab 01: AI Vision</h3>
+                    <!-- ไอคอนมุมขวาบน -->
+                    <svg class="w-6 h-6 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                </div>
+                <p class="text-sm text-gray-400 mt-auto leading-relaxed">
+                    ระบบตรวจจับภาพและวิเคราะห์ด้วย AI Model
+                </p>
+            </div>
+        </a>
+        <!-- 🔴 จบลิงก์ที่ 1 -->
+
+        <!-- 🟢 ลิงก์ที่ 2 -->
+        <a href="https://example.com/lab2" target="_blank" class="card">
+            <div class="card-content">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xl font-bold text-white">Lab 02: Data Dash</h3>
+                    <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                </div>
+                <p class="text-sm text-gray-400 mt-auto leading-relaxed">
+                    แดชบอร์ดสรุปข้อมูลแบบ Real-time ดึงข้อมูลจาก API
+                </p>
+            </div>
+        </a>
+        <!-- 🔴 จบลิงก์ที่ 2 -->
+
+        <!-- 🟢 ลิงก์ที่ 3 -->
+        <a href="https://example.com/lab3" target="_blank" class="card">
+            <div class="card-content">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xl font-bold text-white">Lab 03: Web3 DApp</h3>
+                    <svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <p class="text-sm text-gray-400 mt-auto leading-relaxed">
+                    ทดสอบการเชื่อมต่อ Smart Contract และกระเป๋าเงินดิจิทัล
+                </p>
+            </div>
+        </a>
+        <!-- 🔴 จบลิงก์ที่ 3 -->
+
+        <!-- 🟢 ลิงก์ที่ 4 -->
+        <a href="https://example.com/lab4" target="_blank" class="card">
+            <div class="card-content">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xl font-bold text-white">Lab 04: UI/UX Play</h3>
+                    <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+                </div>
+                <p class="text-sm text-gray-400 mt-auto leading-relaxed">
+                    ทดลองสร้าง Interactive Animation แสนสนุกบนหน้าเว็บ
+                </p>
+            </div>
+        </a>
+        <!-- 🔴 จบลิงก์ที่ 4 -->
+
+        <!-- 🟢 ลิงก์ที่ 5 -->
+        <a href="https://example.com/lab5" target="_blank" class="card">
+            <div class="card-content">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xl font-bold text-white">Lab 05: IoT Control</h3>
+                    <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                </div>
+                <p class="text-sm text-gray-400 mt-auto leading-relaxed">
+                    หน้าต่างควบคุมอุปกรณ์ IoT ผ่านเว็บเบราว์เซอร์
+                </p>
+            </div>
+        </a>
+        <!-- 🔴 จบลิงก์ที่ 5 -->
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto py-10 text-gray-600 text-sm fade-in-up" style="animation-delay: 0.4s;">
+        <p>&copy; 2026 PASAN LABS. All rights reserved.</p>
+    </footer>
+
+    <!-- 
+        =======================================================================
+        JavaScript สำหรับควบคุมการทำงานของแสง (Glowing Mouse Effect)
+        =======================================================================
+    -->
+    <script>
+        // ฟังก์ชันจับตำแหน่งเมาส์และส่งค่า x,y ไปให้ CSS เรืองแสงรอบกรอบการ์ด
+        document.getElementById("cards").onmousemove = e => {
+            // ค้นหาการ์ดทั้งหมด
+            for(const card of document.getElementsByClassName("card")) {
+                // คำนวณตำแหน่งเมาส์ให้อยู่ในขอบเขตของการ์ดแต่ละใบ
+                const rect = card.getBoundingClientRect(),
+                      x = e.clientX - rect.left,
+                      y = e.clientY - rect.top;
+                
+                // ส่งค่าพิกัดไปยัง CSS Variables
+                card.style.setProperty("--mouse-x", `${x}px`);
+                card.style.setProperty("--mouse-y", `${y}px`);
+            }
+        };
+
+        // เพื่อรองรับมือถือ (Touch screen) ให้มีแสงชั่วคราวเวลาสัมผัส
+        document.getElementById("cards").ontouchmove = e => {
+            const touch = e.touches[0];
+            for(const card of document.getElementsByClassName("card")) {
+                const rect = card.getBoundingClientRect(),
+                      x = touch.clientX - rect.left,
+                      y = touch.clientY - rect.top;
+                
+                card.style.setProperty("--mouse-x", `${x}px`);
+                card.style.setProperty("--mouse-y", `${y}px`);
+            }
+        };
+    </script>
+</body>
+</html>
